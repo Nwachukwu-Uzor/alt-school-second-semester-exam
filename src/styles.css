@@ -1,0 +1,17 @@
+body {
+  background: #24c6dc;
+  background: -webkit-linear-gradient(to right, #514a9d, #24c6dc);
+  background: linear-gradient(to right, #514a9d, #24c6dc);
+  color: #2d2d2d;
+}
+
+.container {
+  width: 95%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-block: 1rem;
+}
+
+.section-gap-t {
+    margin-top: 3rem;
+}
