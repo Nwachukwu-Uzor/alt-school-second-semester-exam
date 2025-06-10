@@ -161,7 +161,7 @@ http {
 sudo systemctl restart ngnix
 ```
 Now the page is accessible via:
-- The Proxy server [ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/proxy/second-semester-exam](ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/proxy/second-semester-exam)
-- Directly from nginx [ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project](ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project)
+- The Proxy server [http://ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/proxy/second-semester-exam](http://ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/proxy/second-semester-exam)
+- Directly from nginx [http://ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project](http://ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project)
 
 
