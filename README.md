@@ -101,3 +101,67 @@ Save again <br />
 ```
 pm2 save
 ```
+8. In order to serve the html file statically from the node app reverse proxy add the following line to the express app
+```
+const LANDING_PAGE_PATH = process.env.LANDING_PAGE_PATH;
+
+app.use("/second-semester-exam", express.static(LANDING_PAGE_PATH));
+
+app.get("/second-semester-exam/{*any}", (_req, res) => {
+  res.sendFile(path.join(LANDING_PAGE_PATH, "index.html"));
+});
+```
+
+9. Create a ".env" file at the root of the server folder and add
+```
+PORT=8080
+LANDING_PAGE_PATH=/var/www/html/final-project
+```
+This way we can dynamically provide the landing page page source folder.
+
+10. Restart the application
+```
+pm2 reload proxy-server --update-env
+```
+11. Edit the ngnix.conf file to allow this application to be accessible:
+```
+http {
+    ...
+    server {
+		listen 80;
+		server_name ec2-3-252-207-141.eu-west-1.compute.amazonaws.com;
+		location /final-project {
+			alias /var/www/html/final-project/;
+			index index.html;
+		}
+		location /proxy/ {
+        		proxy_pass http://localhost:8080/;
+        		proxy_http_version 1.1;
+        		proxy_set_header Upgrade $http_upgrade;
+        		proxy_set_header Connection 'upgrade';
+        		proxy_set_header Host $host;
+        		proxy_cache_bypass $http_upgrade;
+    		}
+
+		location /second-semester-exam {
+			proxy_pass http://localhost:8080;
+			proxy_http_version 1.1;
+			proxy_set_header Upgrade $http_upgrade;
+			proxy_set_header Connection 'upgrade';
+			proxy_set_header Host $host;
+			proxy_cache_bypass $http_upgrade;
+		}
+
+	}
+    ...
+}
+``` 
+12. Restart nginx to use this updated configuration:
+```
+sudo systemctl restart ngnix
+```
+Now the page is accessible via:
+- The Proxy server [ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/proxy/second-semester-exam](ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/proxy/second-semester-exam)
+- Directly from nginx [ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project](ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project)
+
+
