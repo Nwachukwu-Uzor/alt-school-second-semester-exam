@@ -28,43 +28,76 @@
 <strong>NOTE - </strong> The SSH key create earlier must be on the local system
 - Open a terminal on the local system
 - Change the the permission of the .pem file downloaded to your local system to only allow read access for the owner:<br />
-```chmod 400 <path-to-key-file>```
+```
+chmod 400 <path-to-key-file>
+```
 - Connect to the instance using this syntax: <br />
-```ssh -i <path-to-key-file> <ec2-username>@<ec2-public-dns>```
+```
+ssh -i <path-to-key-file> <ec2-username>@<ec2-public-dns>
+```
 5. Once connected to the remote machine, update the package index using the command 
-```sudo apt update```
+```
+sudo apt update
+```
 6. Install nginx using the command: <br />
-```sudo apt install nginx```
+```
+sudo apt install nginx
+```
 7. Check if nginx is running: <br />
-```systemctl status nginx```
+```
+systemctl status nginx
+```
 8. Copy the contents of the local code file to the EC2 server using the command:
-```scp -P 22 -i <path-to-key-file> -r <path-to-source-code-on-local-system> <ec2-username>:<ec2-public-dns>:<absolute-path-to-destination-location>```
+```
+scp -P 22 -i <path-to-key-file> -r <path-to-source-code-on-local-system> <ec2-username>:<ec2-public-dns>:<absolute-path-to-destination-location>
+```
 9. Copy the html file, css and any Javascript file from the location on the EC2 instance to the /var/www/html folder using the command: <br />
-```cp -r <source-folder>/* /var/www/html```
+```
+cp -r <source-folder>/* /var/www/html
+```
 10. Restart nginx using the command: <br />
-```systemctl restart nginx```
+```
+systemctl restart nginx
+```
 
 ## Step 3 (Optional): Set Up Reverse Proxy
 1. Copy the contents of the "server" folder from the local machine to remote machine, use "rsync" command in order to exclude the node_module folder <br />
-```rsync -avz --exclude 'node_modules' -e "ssh -i Final-Exam-Key-Pair.pem -p 22" ../coding/altschool/second-semester-cloud/second-semester-exams/server ubuntu@ec2-3-252-207-141.eu-west-1.compute.amazonaws.com:/home/ubuntu/```
+```
+rsync -avz --exclude 'node_modules' -e "ssh -i Final-Exam-Key-Pair.pem -p 22" ../coding/altschool/second-semester-cloud/second-semester-exams/server ubuntu@ec2-3-252-207-141.eu-west-1.compute.amazonaws.com:/home/ubuntu/
+```
 
 2. Download the deb file for node 20 as the node version in the ubuntu package index might be outdate: <br />
-```curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -```
+```
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+```
 
-3. Install the download package:<br />
-```sudo apt install -y nodejs```
-<br />
-Confirm the downloaded node version using:<br />
-```node -v```
+3. Install the download package:
+```
+sudo apt install -y nodejs
+```
+Confirm the downloaded node version using:
+```
+node -v
+```
 
 4. Install PM2 to manage the application and ensure it always restarts when the server starts up: <br />
-```npm install -g pm2```
+```
+npm install -g pm2
+```
 
-5. Start the proxy server using pm2 <br/>
-```pm2 start app.js --name proxy-server```
-6. Save the current process list <br />
-```pm2 save```
-7. Enable pm2 start the process on server reboot <br />
-```pm2 startup```<br />
+5. Start the proxy server using pm2
+```
+pm2 start app.js --name proxy-server
+```
+6. Save the current process list
+```
+pm2 save
+```
+7. Enable pm2 start the process on server reboot
+```
+pm2 startup
+```
 Save again <br />
-```pm2 save```
+```
+pm2 save
+```
