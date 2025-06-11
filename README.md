@@ -278,3 +278,6 @@ Now my Final Project is available either through:
 [https://uzornwachukwu.name.ng/final-project/](https://uzornwachukwu.name.ng/final-project/)
 2. With a node app as proxy<br/>
 [https://uzornwachukwu.name.ng/proxy/second-semester-exam/](https://uzornwachukwu.name.ng/proxy/second-semester-exam/)
+
+The rendered page looks like
+![Rendered page](./assets/images/rendered-page.png)
