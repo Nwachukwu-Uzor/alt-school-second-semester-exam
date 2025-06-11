@@ -165,3 +165,116 @@ Now the page is accessible via:
 - Directly from nginx [http://ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project](http://ec2-3-252-207-141.eu-west-1.compute.amazonaws.com/final-project)
 
 
+## Step 4 (Optional): SSL Setup
+To set up SSL on the EC2 instance follow these steps:
+1. Purchase a domain from an hosting service provider e.g [whogohost](https://www.whogohost.com/). I was able to get uzornwachukwu.name.ng for under N600.
+2. Log into the domain name provider's website and locate the domains sections, here you will a list of your registered domain.
+3. Click on the domain you want to connect to EC2 instance, this opens up more details about the domain
+![Screenshoot](./assets/images/Domains-list.png "Select Domain")
+4. In the details page, click on the "DNS Management Tab". This open a popup to set up a DNS record.
+![Screenshoot](./assets/images/dns-management-cta.png "DNS management")
+5. Click on the "Add Record" CTA
+![Screenshoot](./assets/images/add-new-record.png "Add New ")
+This pops up a form to add a new record:
+![Screenshoot](./assets/images/a-name-record.png "Add New Record")
+The ipv4 address should be the public ipv4 address of your ubuntu EC2 instance.<br />
+To Get this
+	1. Log into to AWS management console.
+	2. Locate the EC2 instance on the "Instances" table and copy the public IPv4 address
+
+6. Connect to your EC2 instance using SSH
+7. Edit the default sites available file in nginx located at "/etc/nginx/sites-available/default" and add this line to your server_name directive:
+```
+server_name uzornwachukwu.name.ng;
+
+location /.well-known/acme-challenge/ {
+		allow all;
+		root /var/www/html;
+	}
+```
+So the main server block looks like this:
+```
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name uzornwachukwu.name.ng;
+
+		location /.well-known/acme-challenge/ {
+		allow all;
+		root /var/www/html;
+		}
+
+    location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+}
+```
+8. Add the registry that contains certbot to your local package index
+```
+sudo add-apt-repository ppa:certbot/certbot
+```
+9. Then update package index
+```
+sudo apt update
+```
+10. Install certbot:
+```
+sudo apt install certbot python3-certbot-nginx 
+```
+11. Add the SSL certificate to the domain name configure using the command:
+```
+sudo certbot --nginx -d uzornwachukwu.name.ng
+```
+12. Edit the default nginx.conf file and add the server_name block to the main server directive
+```
+server_name uzornwachukwu.name.ng;
+```
+
+13. Add a second server block for https connection:
+```
+server {
+        listen 443 ssl;
+        server_name uzornwachukwu.name.ng;
+
+        ssl_certificate /etc/letsencrypt/live/uzornwachukwu.name.ng/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/uzornwachukwu.name.ng/privkey.pem;
+
+        location /final-project {
+            alias /var/www/html/final-project/;
+            index index.html;
+        }
+
+        location /proxy/ {
+            proxy_pass http://localhost:8080/;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+
+        location /second-semester-exam {
+            proxy_pass http://localhost:8080/second-semester-exam;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_cache_bypass $http_upgrade;
+        }
+    }
+```
+My final nginx.conf file looks like this:
+[Nginx Config](./nginx.conf)
+
+Now my Final Project is available either through:
+1. Without Proxy <br />
+[https://uzornwachukwu.name.ng/final-project/](https://uzornwachukwu.name.ng/final-project/)
+2. With a node app as proxy<br/>
+[https://uzornwachukwu.name.ng/proxy/second-semester-exam/](https://uzornwachukwu.name.ng/proxy/second-semester-exam/)
